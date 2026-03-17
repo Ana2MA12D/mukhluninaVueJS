@@ -1,22 +1,47 @@
 <script>
-import { useAuthStore } from "@/stores/authStore.js";
+import {useAuthStore} from "@/stores/authStore.js";
+import Button from "primevue/button";
+import Menubar from "primevue/menubar";
+import InputText from "primevue/inputtext";
 
 export default {
-  data () {
+  components: {Button, Menubar, InputText},
+  data() {
     return {
+      date: '',
       email: '',
       password: '',
       authStore: useAuthStore(),
+      items: [
+        {
+          label: 'Главная страница',
+          icon: 'pi pi-fw pi-home',
+          route: '/',
+          shortcut: 'Ctrl + H',
+          submenu: [],
+        },
+        {
+          label: 'Машины',
+          icon: 'pi pi-fw pi-car',
+          route: '/cars',
+
+        },
+        {
+          label: 'Контакты',
+          icon: 'pi pi-fw pi-phone',
+          route: '/contacts',
+        },
+      ]
     };
   },
   computed: {
     isAuthenticated() {
       return this.authStore.isAuthenticated;
     },
-    user () {
+    user() {
       return this.authStore.user;
     },
-    authError () {
+    authError() {
       return this.authStore.errorMessage;
     },
   },
@@ -39,33 +64,40 @@ export default {
 </script>
 
 <template>
-  <header>
-    <nav>
-      <ul>
-        <li><router-link to="/">Главная</router-link></li>
-        <li><router-link to="/cars">Машины</router-link></li>
-        <li><router-link to="/contacts">Контакты</router-link></li>
-      </ul>
-      <div v-if="isAuthenticated && user">
-        Welcome, {{ user.name }}
-        <button @click="logout">Logout</button>
+  <Menubar :model="items">
+    <template #start>
+      <span>
+        <img src="@/assets/logo.png" width="50" alt=""/>
+      </span>
+    </template>
+    <template #item="{ item, props, hasSubmenu, root }">
+      <a class="flex items-center ml-6 p-4">
+        <router-link v-if="item.route" :to="item.route">
+          <span :class="item.icon"/>
+          <span class="ml-1">{{ item.label }}</span>
+        </router-link>
+      </a>
+    </template>
+    <template #end>
+      <div class="flex items-center gap-2">
+        <div v-if="isAuthenticated && user">
+          <span class="pi pi-fw pi-user mr-4"/> {{ user.name }}
+          <Button @click="logout" class="ml-4">Выйти</Button>
+        </div>
+        <div v-else>
+          <form @submit.prevent="login">
+            <InputText v-model="email" type="email" id="email" required placeholder="Логин"
+                       class="m-2 sm:w-auto"
+                       :class="{'p-invalid': authError}"/>
+            <InputText v-model="password" type="password" id="password" required
+                       placeholder="Пароль" class="m-2 sm:w-auto"
+                       :class="{'p-invalid': authError}"/>
+            <Button type="submit">Войти</Button>
+          </form>
+        </div>
       </div>
-      <div v-else>
-        <form @submit.prevent="login">
-          <div>
-            <label for="email">Email:</label>
-            <input v-model="email" type="email" id="email" required/>
-          </div>
-          <div>
-            <label for="password">Password:</label>
-            <input v-model="password" type="password" id="password" required/>
-          </div>
-          <button type="submit">Login</button>
-          <p v-if="authError" class="error">{{ authError }}</p>
-        </form>
-      </div>
-    </nav>
-  </header>
+    </template>
+  </Menubar>
   <router-view></router-view>
 </template>
 
