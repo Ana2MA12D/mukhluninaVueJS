@@ -1,6 +1,4 @@
 <script>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
 import { useAuthStore } from "@/stores/authStore.js";
 
 export default {
@@ -43,6 +41,11 @@ export default {
 <template>
   <header>
     <nav>
+      <ul>
+        <li><router-link to="/">Главная</router-link></li>
+        <li><router-link to="/cars">Машины</router-link></li>
+        <li><router-link to="/contacts">Контакты</router-link></li>
+      </ul>
       <div v-if="isAuthenticated && user">
         Welcome, {{ user.name }}
         <button @click="logout">Logout</button>
@@ -63,6 +66,7 @@ export default {
       </div>
     </nav>
   </header>
+  <router-view></router-view>
 </template>
 
 <style scoped>
