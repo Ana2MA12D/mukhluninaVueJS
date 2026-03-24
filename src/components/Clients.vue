@@ -4,7 +4,7 @@ import Column from "primevue/column";
 import {useDataStore} from "@/stores/dataStore";
 
 export default {
-  name: "Cars",
+  name: "Clients",
   components: {DataTable, Column},
   data() {
     return {
@@ -14,24 +14,24 @@ export default {
     }
   },
   computed: {
-    cars() {
-      return this.dataStore.cars;
+    clients() {
+      return this.dataStore.clients;
     },
-    cars_total() {
-      return this.dataStore.cars_total;
+    clients_total() {
+      return this.dataStore.clients_total;
     }
   },
   mounted() {
-    console.log('Cars component MOUNTED!');
-    this.dataStore.get_cars();
-    this.dataStore.get_cars_total();
-    console.log('Cars=', this.cars);
+    console.log('Clients component MOUNTED!');
+    this.dataStore.get_clients();
+    this.dataStore.get_clients_total();
+    console.log('Clients=', this.clients);
   },
   methods: {
     onPageChange(event) {
       this.offset = event.first;
       this.perpage = event.rows;
-      this.dataStore.get_cars(this.offset / this.perpage, this.perpage);
+      this.dataStore.get_clients(this.offset / this.perpage, this.perpage);
     }
   }
 }
@@ -39,26 +39,21 @@ export default {
 
 <template>
   <DataTable
-    :value="cars"
+    :value="clients"
     :lazy="true"
     :loading="dataStore.loading"
     :paginator="true"
     :rows="perpage"
     :rowsPerPageOptions="[2, 5, 10]"
-    :totalRecords=cars_total
+    :totalRecords=clients_total
     @page="onPageChange"
     responsiveLayout="scroll"
     :first="offset"
   >
     <Column field="id" header="№"/>
-    <Column field="brand" header="Марка"/>
-    <Column field="model" header="Модель"/>
-    <Column field="status" header="Статус">
-      <template #body="slotProps">
-        {{ slotProps.data.status ? 'Свободно' : 'Занято' }}
-      </template>
-    </Column>
-    <Column field="price" header="Цена руб./сутки"/>
+    <Column field="name" header="Марка"/>
+    <Column field="lastName" header="Модель"/>
+    <Column field="phone" header="Цена руб./сутки"/>
   </DataTable>
 </template>
 

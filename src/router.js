@@ -1,7 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
+import {useAuthStore} from "@/stores/authStore";
 import Home from '@/components/Home.vue'
 import Cars from '@/components/Cars.vue'
-import Contacts from '@/components/Contacts.vue'
+import Clients from "@/components/Clients.vue";
+
 const routes = [
   {
     path: '/',
@@ -12,8 +14,9 @@ const routes = [
     component: Cars,
   },
   {
-    path: '/contacts',
-    component: Contacts,
+    path: '/clients',
+    component: Clients,
+    meta: {requiresAdmin: true},
   },
 ];
 const router = createRouter({
@@ -21,4 +24,19 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+
+  if (to.meta.requiresAdmin) {
+    if (!authStore.user) {
+      return next("/");
+    }
+
+    if (!authStore.user.is_admin) {
+      return next("/");
+    }
+  }
+
+  next();
+});
 export default router;

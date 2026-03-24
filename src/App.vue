@@ -27,9 +27,9 @@ export default {
 
         },
         {
-          label: 'Контакты',
+          label: 'Клиенты',
           icon: 'pi pi-fw pi-phone',
-          route: '/contacts',
+          route: '/clients',
         },
       ]
     };
@@ -93,6 +93,9 @@ export default {
                        placeholder="Пароль" class="m-2 sm:w-auto"
                        :class="{'p-invalid': authError}"/>
             <Button type="submit">Войти</Button>
+            <p v-if="authStore.errorMessage" style="color: red;">
+              {{ authStore.errorMessage }}
+            </p>
           </form>
         </div>
       </div>
