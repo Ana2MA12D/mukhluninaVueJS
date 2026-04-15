@@ -51,9 +51,9 @@ export default {
     :first="offset"
   >
     <Column field="id" header="№"/>
-    <Column field="name" header="Марка"/>
-    <Column field="lastName" header="Модель"/>
-    <Column field="phone" header="Цена руб./сутки"/>
+    <Column field="lastName" header="Фамилия"/>
+    <Column field="name" header="Имя"/>
+    <Column field="phone" header="Номер телефона"/>
   </DataTable>
 </template>
 

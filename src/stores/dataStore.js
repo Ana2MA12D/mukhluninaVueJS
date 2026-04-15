@@ -10,6 +10,7 @@ export const useDataStore = defineStore('data', {
     clients: [],
     clients_total: null,
     items: [],
+    errorCode: "",
     errorMessage: "",
   }),
   actions: {
@@ -63,7 +64,7 @@ export const useDataStore = defineStore('data', {
         });
         this.clients = response.data;
       } catch (error) {
-        if (error.response) {
+        if (error.response) {S
           this.errorMessage = error.response.data.message;
           console.log(error);
         } else if (error.request) {
@@ -91,5 +92,61 @@ export const useDataStore = defineStore('data', {
         }
       }
     },
+    async create_car(formData) {
+      this.errorMessage = "";
+      try {
+        const response = await axios.post(backendUrl + '/car', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+          }
+        );
+        this.errorCode = response.data.code;
+        this.errorMessage = response.data.message;
+      } catch (error) {
+        if (error.response) {
+          this.errorCode = 11;
+          this.errorMessage = error.response.data.message;
+          console.log(error);
+        } else if (error.request) {
+          this.errorCode = 12;
+          this.errorMessage = error.message;
+          console.log(error);
+        } else {
+          this.errorCode = 13;
+          console.log(error);
+        }
+      }
+    },
+    async create_rentalOrder(formData) {
+      this.errorMessage = "";
+      try {
+        const response = await axios.post(backendUrl + '/rental_order', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: 'Bearer ' + localStorage.getItem('token')
+            },
+          }
+        );
+        this.errorCode = response.data.code;
+        this.errorMessage = response.data.message;
+      } catch (error) {
+        if (error.response) {
+          this.errorCode = 11;
+          this.errorMessage = error.response.data.message;
+          console.log(error);
+        } else if (error.request) {
+          this.errorCode = 12;
+          this.errorMessage = error.message;
+          console.log(error);
+        } else {
+          this.errorCode = 13;
+          console.log(error);
+        }
+      }
+    },
   },
 });
+
+

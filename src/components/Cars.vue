@@ -2,13 +2,17 @@
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import {useDataStore} from "@/stores/dataStore";
+import Button from "primevue/button";
+import {useAuthStore} from "@/stores/authStore.js";
+
 
 export default {
   name: "Cars",
-  components: {DataTable, Column},
+  components: {DataTable, Column, Button},
   data() {
     return {
       dataStore: useDataStore(),
+      authStore: useAuthStore(),
       perpage: 5,
       offset: 0,
     }
@@ -59,9 +63,52 @@ export default {
       </template>
     </Column>
     <Column field="price" header="Цена руб./сутки"/>
+    <Column field="image" header="Фото">
+      <template #body="slotProps">
+        <div class="image-wrapper">
+          <img
+            v-if="slotProps.data.image"
+            :src="slotProps.data.image"
+            alt="Фото автомобиля"
+            class="car-image"
+
+          />
+          <span v-else class="no-image">Нет фото</span>
+        </div>
+
+      </template>
+    </Column>
+    <template #footer>
+      <div v-if="authStore.user && authStore.user.is_admin" class="text-end">
+        <Button type="button" @click="this.$router.push('/createCar')" icon="pi pi-plus"
+                label="Добавить автомобиль"/>
+      </div>
+    </template>
   </DataTable>
 </template>
 
-<style scoped>
 
+<style scoped>
+.image-wrapper {
+  width: 140px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+  border: 1px solid #dcdcdc;
+  background-color: #f7f7f7;
+}
+
+.car-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.no-image {
+  font-size: 12px;
+  color: #777;
+}
 </style>

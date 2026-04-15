@@ -31,6 +31,11 @@ export default {
           icon: 'pi pi-fw pi-phone',
           route: '/clients',
         },
+        {
+          label: 'Создать заказ',
+          icon: 'pi pi-fw pi-plus',
+          route: '/createRentalOrder',
+        },
       ]
     };
   },
