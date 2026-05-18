@@ -8,6 +8,7 @@ import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import 'primeicons/primeicons.css';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from "primevue/confirmationservice";
 
 
 const app = createApp(App);
@@ -15,6 +16,7 @@ const app = createApp(App);
 app.use(ToastService);
 app.use(createPinia());
 app.use(router);
+app.use(ConfirmationService);
 app.use(PrimeVue, {
   theme: {
     preset: Aura,

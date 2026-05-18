@@ -28,6 +28,10 @@ const routes = [
 
   },
   {
+    path: '/createCar/:id?',
+    component: CreateCar,
+  },
+  {
     path: '/createRentalOrder',
     component: CreateRentalOrder,
   },

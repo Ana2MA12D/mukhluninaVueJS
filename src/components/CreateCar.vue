@@ -24,6 +24,34 @@ export default {
     },
     errorCode() {
       return this.dataStore.errorCode
+    },
+    isEdit() {
+      return !!this.$route.params.id;
+    },
+    carId() {
+      return this.$route.params.id;
+    },
+  },
+
+  watch: {
+    carId: {
+      handler(newId) {
+        if (newId) {
+          const car = this.dataStore.cars.find(c => c.id == newId);
+          if (car) {
+            this.carBrand = car.brand;
+            this.carGov_number = car.gov_number;
+            this.carStatus = car.status;
+            this.carModel = car.model;
+            this.carPrice = car.price;
+            this.carImage = null;
+          }
+        } else {
+          this.carModel = '';
+          this.carImage = null;
+        }
+      },
+      immediate: true
     }
   },
 
@@ -47,7 +75,14 @@ export default {
       formData.append('status', this.carStatus);
       formData.append('price', this.carPrice);
       formData.append('image', this.carImage);
-      await this.dataStore.create_car(formData);
+      if (this.carImage) {
+        formData.append('image', this.carImage);
+      }
+      if (this.isEdit) {
+        await this.dataStore.update_car(formData, this.carId);
+      } else {
+        await this.dataStore.create_car(formData);
+      }
       if (this.errorCode > 0)
         this.$toast.add({
           severity: 'error',
@@ -70,7 +105,8 @@ export default {
 <template>
   <div class="flex justify-center">
     <form v-on:submit.prevent="createCar" class="w-1/2 p-6">
-      <h2 class="text-2xl mb-4 text-center" style="color: dimgray">Добавление автомобиля</h2>
+      <h2 class="text-2xl mb-4 text-center" style="color: dimgray">
+        {{ isEdit ? 'Редактирование' : 'Добавление' }} автомобиля</h2>
       <div class="flex flex-col mt-4">
         <InputText type="text" placeholder="Введите марку авто" v-model="this.carBrand"/>
       </div>
@@ -84,15 +120,17 @@ export default {
         <InputText type="text" placeholder="Введите цену авто" v-model="this.carPrice"/>
       </div>
       <div class="mt-4">
-        <span class="block mb-2 text-gray-600">Статус автомобиля</span>
+        <span class="block mb-2 text-gray-600">Наличие детского кресла</span>
         <div class="flex items-center gap-4">
           <div class="flex items-center gap-2">
-            <input type="radio" id="status-free" value="true" v-model="this.carStatus" name="carStatus"/>
-            <label for="status-free">Свободно</label>
+            <input type="radio" id="status-free" value="true" v-model="this.carStatus"
+                   name="carStatus"/>
+            <label for="status-free">Есть</label>
           </div>
           <div class="flex items-center gap-2">
-            <input type="radio" id="status-busy" value="false" v-model="this.carStatus" name="carStatus"/>
-            <label for="status-busy">Занято</label>
+            <input type="radio" id="status-busy" value="false" v-model="this.carStatus"
+                   name="carStatus"/>
+            <label for="status-busy">Отсутствует</label>
           </div>
         </div>
       </div>
@@ -100,11 +138,12 @@ export default {
         <label for="file" id="file-label"
                class="block text-md font-medium text-gray-500 border border-gray-300 rounded-md p-2">
           <span class="pi pi-upload mx-3"></span>Выбрать изображение</label>
-        <input type="file" hidden id="file" name="file" v-on:change="changeCaption" required
+        <input type="file" hidden id="file" name="file" v-on:change="changeCaption"
+               :required="!isEdit"
                accept="image/*">
       </div>
       <div class="flex flex-col mt-6">
-        <Button type="submit" label="Создать"/>
+        <Button type="submit" :label="isEdit ? 'Сохранить' : 'Создать'"></Button>
       </div>
     </form>
   </div>

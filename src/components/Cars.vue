@@ -4,17 +4,20 @@ import Column from "primevue/column";
 import {useDataStore} from "@/stores/dataStore";
 import Button from "primevue/button";
 import {useAuthStore} from "@/stores/authStore.js";
-
+import InputText from "primevue/inputtext";
+import ConfirmPopup from "primevue/confirmpopup";
+import Toast from "primevue/toast";
 
 export default {
   name: "Cars",
-  components: {DataTable, Column, Button},
+  components: {DataTable, Column, Button, InputText, ConfirmPopup, Toast},
   data() {
     return {
       dataStore: useDataStore(),
       authStore: useAuthStore(),
       perpage: 5,
       offset: 0,
+      search: "",
     }
   },
   computed: {
@@ -23,6 +26,12 @@ export default {
     },
     cars_total() {
       return this.dataStore.cars_total;
+    },
+    error_code() {
+      return this.dataStore.errorCode;
+    },
+    error_message() {
+      return this.dataStore.errorMessage;
     }
   },
   mounted() {
@@ -36,6 +45,42 @@ export default {
       this.offset = event.first;
       this.perpage = event.rows;
       this.dataStore.get_cars(this.offset / this.perpage, this.perpage);
+    },
+    onPushSearchButton(event) {
+      this.dataStore.get_cars_total(this.search);
+      this.dataStore.get_cars(undefined, undefined, this.search);
+    },
+    openPopupConfirm(event, data) {
+      this.$confirm.require({
+        message: 'Вы уверены, что хотите удалить автомобиль ' + data.id + '?',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'Да',
+        rejectLabel: 'Нет',
+        accept: () => {
+          this.deleteCar(data.id);
+        },
+      })
+    },
+    selectRow(data) {
+      this.$router.push('/createCar/' + data.id);
+    },
+    async deleteCar(id) {
+      await this.dataStore.delete_car(id);
+      if (this.error_code > 0)
+        this.$toast.add({
+          severity: 'error',
+          summary: "Ошибка удаления автомобиля " + id,
+          detail: this.error_message + " " + this.error_code,
+          life: 4000
+        });
+      else
+        this.$toast.add({
+          severity: 'success',
+          summary: "Автомобиль " + id + " успешно удален",
+          detail: this.error_message,
+          life: 4000
+        });
+      this.dataStore.get_cars(this.offset / this.perpage, this.perpage, this.search);
     }
   }
 }
@@ -54,12 +99,34 @@ export default {
     responsiveLayout="scroll"
     :first="offset"
   >
+    <template #header>
+      <InputText
+        v-model="search"
+        type="text" id="search"
+        required
+        placeholder="Название"
+        class="m-2 sm:w-auto"/>
+      <Button type="button"
+              @click="onPushSearchButton()"
+              icon="pi pi-search"
+              label="Найти"/>
+    </template>
+    <Column class="w-24 !text-end" header="Действия">
+      <template #body="{ data }">
+        <div class="flex justify-between gap-2">
+          <Button icon="pi pi-times-circle" @click="openPopupConfirm($event, data)"
+                  severity="secondary" rounded></Button>
+          <Button icon="pi pi-file-edit" @click="selectRow(data)" severity="secondary"
+                  rounded></Button>
+        </div>
+      </template>
+    </Column>
     <Column field="id" header="№"/>
     <Column field="brand" header="Марка"/>
     <Column field="model" header="Модель"/>
-    <Column field="status" header="Статус">
+    <Column field="status" header="Детское кресло">
       <template #body="slotProps">
-        {{ slotProps.data.status ? 'Свободно' : 'Занято' }}
+        {{ slotProps.data.status ? 'Есть' : 'Нет' }}
       </template>
     </Column>
     <Column field="price" header="Цена руб./сутки"/>
@@ -85,6 +152,8 @@ export default {
       </div>
     </template>
   </DataTable>
+  <ConfirmPopup></ConfirmPopup>
+  <Toast></Toast>
 </template>
 
 
